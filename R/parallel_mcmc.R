@@ -12,12 +12,8 @@
 # fit: A function fitting the model to the data subsample, first argument 
 #      must be data. No other arguments allowed (for now)
 
-parallel_irt <- function(data, cores, combine = "parametric", fit) {
+parallel_mcmc <- function(data, cores, combine = "parametric", fit) {
 
-  
-  # Load C++ combine function
-  sourceCpp("src/comb_nparC.cpp")
-  
   ## Partition the data
   data <- as.data.frame(data)
   n_part <- cores
@@ -56,7 +52,7 @@ parallel_irt <- function(data, cores, combine = "parametric", fit) {
     mean.c <- var.c %*% Reduce("+", mprod)
     return(list("post_means" = mean.c, "post_variance" = var.c))
   }
-
+  
   # Non-parametric combination of subposteriors
   # mcmcout: list of matrices containing posterior samples from the subposteriors
   comb_npar <- function(mcmcout) {
@@ -78,17 +74,17 @@ parallel_irt <- function(data, cores, combine = "parametric", fit) {
     c_dot <- t_dot
     
     out <- matrix(NA, ncol = d, nrow = T_)  
-      for(i in 1:T_) {
-        h <- i^(- 1 / (4 + d))
-        for(m in 1:M) {
-          c_dot <- t_dot
-          c_dot[m] <- sample(c(1:T_), 1)
-          if(runif(1) < w(c_dot, mcmcout, h, d) / w(t_dot, mcmcout, h, d)) {
-            t_dot <- c_dot
-          } 
-        }
-        out[i, ] <- rmvnorm(1, w(t_dot, mcmcout, h, d, mn = T), h^2/M * diag(d))
+    for(i in 1:T_) {
+      h <- i^(- 1 / (4 + d))
+      for(m in 1:M) {
+        c_dot <- t_dot
+        c_dot[m] <- sample(c(1:T_), 1)
+        if(runif(1) < w(c_dot, mcmcout, h, d) / w(t_dot, mcmcout, h, d)) {
+          t_dot <- c_dot
+        } 
       }
+      out[i, ] <- rmvnorm(1, w(t_dot, mcmcout, h, d, mn = T), h^2/M * diag(d))
+    }
     return(out)
   }
   
@@ -100,4 +96,3 @@ parallel_irt <- function(data, cores, combine = "parametric", fit) {
   if (combine == "non parametric") full_post <- comb_npar(sub_post)
   return(list(full = full_post, subs = sub_post))
 }
-
