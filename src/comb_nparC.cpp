@@ -65,6 +65,7 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
 }
 
+
 NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
   NumericMatrix sel(M, d);
   for(int i = 0; i < M; ++i) {
