@@ -1,16 +1,15 @@
-# ======================================================================
-# Function for parallel sampling from bayesian posteriors as described in 
-# Neiswanger et al. (2013)
-# 
-# Fridolin Linder
-#
-# Arguments:
-# data: original data set
-# cores: number of cores to be used = number of sub posteriors estimated
-# combine: Parametric, Semiparametric or Non- Parametric combination of
-#          sub posteriors (Semi not implemented yet and non very slow)
-# fit: A function fitting the model to the data subsample, first argument 
-#      must be data. No other arguments allowed (for now)
+#' Fit Bayesian Models in Parallel
+#' 
+#' @param data A \code{matrix} or \code{data.frame} containing the complete data
+#' set.
+#' @param cores The number of cores to be used to fit the model. This implies the 
+#' number of partitions created. If not supplied the number of cores is detected 
+#' automatically.
+#' @param combine Method to be used to combine sub-posteriors to the full posterior
+#' @param  fit A function fitting the model to the data subsample, first argument 
+#' must be data. No other arguments allowed (for now)
+#' (\code{"parametric"}, \code{"semi-parametric"} (or \code{"non-parametric"}))
+#' @return A list containing the full posterior and the sub-posteriors
 
 parallel_mcmc <- function(data, cores, combine = "parametric", fit) {
 
@@ -21,8 +20,7 @@ parallel_mcmc <- function(data, cores, combine = "parametric", fit) {
   assgn <- sample(rep(1:n_part, length.out = n))
   pdat <- split(data, assgn) 
   attr(pdat, "names") <- NULL
-  
-  
+    
   # -----------------------------------------
   # Fit model to each subsample
   # ----------------------------------------
