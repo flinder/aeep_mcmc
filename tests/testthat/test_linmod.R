@@ -15,10 +15,11 @@ fit <- function(dat){
   initsList <- list(b0 = -1, b = c(0, 0), tau = 1)
   params = c("b0", "b", "tau")
   jmod <- jags.model("tests/testthat/linear_regression.txt", data = dataList, 
-                     n.chains = 1, n.adapt = 500)
+                     n.chains = 4, n.adapt = 500)
   mcmcres <- coda.samples(model = jmod, variable.names = params, 
                           n.iter = 1000, thin = 1)
   return(mcmcres[[1]])
 }
-fit(dat)
-out <- parallel_mcmc(data = dat, cores = 4, combine = "parametric")
+full_mod <- fit(dat)
+
+out <- parallel_mcmc(dat, cores = 4, combine = "parametric", fun = fit)
