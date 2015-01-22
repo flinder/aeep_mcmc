@@ -1,40 +1,44 @@
-/* still has fixed seed for testing */
-
+/* still has fixed seed */
 #include <RcppArmadilloExtensions/sample.h>
 using namespace Rcpp;
 
 // [[Rcpp::depends("RcppArmadillo")]]
 
 // Rcpp::NumericMatrix to arma::mat
+// [[Rcpp::export]]
   arma::mat m_conv(NumericMatrix x) {
     arma::mat y = as<arma::mat>(x);
     return(y);
   }
 
 // Rcpp::NumericVector to arma::rowvec
+// [[Rcpp::export]]
 arma::mat v_conv(NumericVector x) {
   arma::mat y = as<arma::rowvec>(x);
   return(y);
 }
 
+// Rcpp::NumericVector to arma::vec
+// [[Rcpp::export]]
 arma::mat v_conv1(NumericVector x) {
   arma::mat y = as<arma::vec>(x);
   return(y);
 }
 
 // Mean from NumericVector
+// [[Rcpp::export]]
 double nv_mean(NumericVector x) {
   return sum(x) / x.size();
 }
 
 // multivariate normal density
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
-const double log2pi = std::log(2.0 * M_PI);
-
+// [[Rcpp::export]]
 arma::vec dmvnrm_arma(NumericMatrix x_i,  
                       NumericVector mean_i,  
                       NumericMatrix sigma_i, 
                       bool logd = false) {
+  const double log2pi = std::log(2.0 * M_PI);
   arma::mat x = m_conv(x_i);
   arma::mat sigma = m_conv(sigma_i);
   arma::rowvec mean = v_conv(mean_i);
@@ -58,13 +62,14 @@ arma::vec dmvnrm_arma(NumericMatrix x_i,
 
 // multivariate normal random number generator
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/simulate-multivariate-normal/)
+// [[Rcpp::export]]
 arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
    int ncols = sigma.n_cols;
    arma::mat Y = arma::randn(n, ncols);
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
 }
 
-
+// [[Rcpp::export]]
 NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
   
   NumericMatrix sel(M, d);
@@ -82,6 +87,7 @@ NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
   return theta_bar;
 }
 
+// [[Rcpp::export]]
 double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
   
   NumericMatrix sel(M, d);
@@ -106,7 +112,7 @@ double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
 /* Main Function */
 
 // [[Rcpp::export]]
-NumericMatrix comb_npar(List mcmcout) {
+NumericMatrix comb_nparC(List mcmcout) {
   srand (1);
   NumericMatrix exmpl = mcmcout[0];
   int d = exmpl.ncol();
