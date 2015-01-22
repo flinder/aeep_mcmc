@@ -30,7 +30,7 @@ parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
   # Fit model to each subsample
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl) 
-  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(dat = i)}
+  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(dat = i, M = n_part)}
   parallel::stopCluster(cl)
   
   # --------------------------------------------------------
