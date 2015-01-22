@@ -1,0 +1,11 @@
+model {
+    for(i in 1:N) {
+      y[i] ~ dnorm(mu[i], tau)
+      mu[i] <- b0 + inprod(b[], x[i,])
+    }
+    tau ~ dgamma(.01,.01)
+    b0 ~ dnorm(0,1.0E-12)
+    for (j in 1:K) {
+      b[j] ~ dnorm(0,1.0E-12)
+    }
+  }
