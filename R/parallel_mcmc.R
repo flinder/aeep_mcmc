@@ -19,7 +19,7 @@ parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
 
   # -----------------------------------------
   # Partition the data
-  data <- as.data.frame(dat)
+  dat <- as.data.frame(dat)
   n_part <- cores
   n <- nrow(dat)
   assgn <- sample(rep(1:n_part, length.out = n))
