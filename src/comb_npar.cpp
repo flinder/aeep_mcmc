@@ -1,3 +1,5 @@
+/* still has fixed seed for testing */
+
 #include <RcppArmadilloExtensions/sample.h>
 using namespace Rcpp;
 
@@ -105,7 +107,7 @@ double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
 
 // [[Rcpp::export]]
 NumericMatrix comb_nparC(List mcmcout) {
-  
+  srand (1);
   NumericMatrix exmpl = mcmcout[0];
   int d = exmpl.ncol();
   int T = exmpl.nrow();
