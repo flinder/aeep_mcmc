@@ -28,6 +28,7 @@ double nv_mean(NumericVector x) {
 // multivariate normal density
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
 const double log2pi = std::log(2.0 * M_PI);
+
 arma::vec dmvnrm_arma(NumericMatrix x_i,  
                       NumericVector mean_i,  
                       NumericMatrix sigma_i, 
@@ -35,7 +36,6 @@ arma::vec dmvnrm_arma(NumericMatrix x_i,
   arma::mat x = m_conv(x_i);
   arma::mat sigma = m_conv(sigma_i);
   arma::rowvec mean = v_conv(mean_i);
-  
   int n = x.n_rows;
   int xdim = x.n_cols;
   arma::vec out(n);
@@ -56,7 +56,7 @@ arma::vec dmvnrm_arma(NumericMatrix x_i,
 
 // multivariate normal random number generator
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/simulate-multivariate-normal/)
-arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
+arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
    int ncols = sigma.n_cols;
    arma::mat Y = arma::randn(n, ncols);
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
@@ -64,6 +64,7 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
 
 
 NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
+  
   NumericMatrix sel(M, d);
   for(int i = 0; i < M; ++i) {
     NumericMatrix postmat = mcmcout[i];
@@ -80,6 +81,7 @@ NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
 }
 
 double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
+  
   NumericMatrix sel(M, d);
   for(int i = 0; i < M; ++i) {
     NumericMatrix postmat = mcmcout[i];
@@ -104,10 +106,10 @@ double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
 // [[Rcpp::export]]
 NumericMatrix comb_nparC(List mcmcout) {
   
-  NumericMatrix expl = mcmcout[0];
-  int d = expl.ncol();
-  int T = expl.nrow();
-	int M = mcmcout.size();
+  NumericMatrix exmpl = mcmcout[0];
+  int d = exmpl.ncol();
+  int T = exmpl.nrow();
+  int M = mcmcout.size();
   IntegerVector Ts(T);
   for(int i = 0; i < T; i++) {
     Ts[i] = i;
@@ -117,7 +119,6 @@ NumericMatrix comb_nparC(List mcmcout) {
   IntegerVector urand = RcppArmadillo::sample(Ts, (M * T), TRUE);
   int icount = 0;
   NumericMatrix out(T, d);
-  
   
 	for(int i = 0; i < T; ++i) {
 		double h = pow(i, (- 1 / (4 + d)));
@@ -139,7 +140,7 @@ NumericMatrix comb_nparC(List mcmcout) {
     sig.fill_diag(pow(h, 2) / M);
     arma::vec mu = v_conv1(theta_b);
     arma::mat sigma = m_conv(sig);
-    arma::mat draws = mvrnormArma(1, mu, sigma);
+    arma::mat draws = mvrnorm_arma(1, mu, sigma);
     NumericVector draws_rcpp = wrap(draws);
     NumericMatrix::Row outrow = out(i, _);
     outrow = draws_rcpp;
