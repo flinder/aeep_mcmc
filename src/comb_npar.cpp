@@ -112,7 +112,7 @@ double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
 /* Main Function */
 
 // [[Rcpp::export]]
-NumericMatrix comb_nparC(List mcmcout) {
+NumericMatrix comb_npar(List mcmcout) {
   srand (1);
   NumericMatrix exmpl = mcmcout[0];
   int d = exmpl.ncol();

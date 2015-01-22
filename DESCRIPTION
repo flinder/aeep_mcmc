@@ -10,7 +10,7 @@ Description: This packages allows the estimation of IRT models in parallel. It
   is based on the algorithms described in Neiswanger et al. 2014.  
 License: MIT + file LICENSE
 Imports: 
-  doParallel,
+  foreach,
   mvtnorm,
   Rcpp (>= 0.11.1),
   RcppArmadillo (>= 0.4.200.0)

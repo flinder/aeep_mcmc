@@ -22,4 +22,4 @@ fit <- function(dat){
 }
 full_mod <- fit(dat)
 
-out <- parallel_mcmc(dat, cores = 4, combine = "parametric", fun = fit)
+out <- parallel_mcmc(dat, cores = 4, combine = "non-parametric", fun = fit)

@@ -33,7 +33,7 @@ mix_weight <- function(t, mcmcout, h, d, M) {
     .Call('irtpar_mix_weight', PACKAGE = 'irtpar', t, mcmcout, h, d, M)
 }
 
-comb_nparC <- function(mcmcout) {
-    .Call('irtpar_comb_nparC', PACKAGE = 'irtpar', mcmcout)
+comb_npar <- function(mcmcout) {
+    .Call('irtpar_comb_npar', PACKAGE = 'irtpar', mcmcout)
 }
 

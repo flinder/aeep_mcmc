@@ -4,21 +4,21 @@
 \alias{parallel_mcmc}
 \title{Fit Bayesian Models in Parallel}
 \usage{
-parallel_mcmc(data, cores, combine = "parametric", fit)
+parallel_mcmc(dat, cores, combine = "parametric", fun)
 }
 \arguments{
-\item{data}{A \code{matrix} or \code{data.frame} containing the complete data
-set.}
-
 \item{cores}{The number of cores to be used to fit the model. This implies the
 number of partitions created. If not supplied the number of cores is detected
 automatically.}
 
 \item{combine}{Method to be used to combine sub-posteriors to the full posterior}
 
-\item{fit}{A function fitting the model to the data subsample, first argument
-must be data. No other arguments allowed (for now)
+\item{fun}{A function fitting the model to the data subsample, first argument
+must be dat. No other arguments allowed (for now)
 (\code{"parametric"}, \code{"semi-parametric"} (or \code{"non-parametric"}))}
+
+\item{data}{A \code{matrix} or \code{data.frame} containing the complete data
+set.}
 }
 \value{
 A list containing the full posterior and the sub-posteriors

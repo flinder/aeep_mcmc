@@ -139,15 +139,15 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// comb_nparC
-NumericMatrix comb_nparC(List mcmcout);
-RcppExport SEXP irtpar_comb_nparC(SEXP mcmcoutSEXP) {
+// comb_npar
+NumericMatrix comb_npar(List mcmcout);
+RcppExport SEXP irtpar_comb_npar(SEXP mcmcoutSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< List >::type mcmcout(mcmcoutSEXP );
-        NumericMatrix __result = comb_nparC(mcmcout);
+        NumericMatrix __result = comb_npar(mcmcout);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -8,4 +8,6 @@
 #'
 #' @docType package
 #' @name foo
+#' @useDynLib irtpar
+#' @importFrom Rcpp sourceCpp
 NULL

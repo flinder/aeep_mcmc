@@ -1,5 +1,7 @@
 #' Fit Bayesian Models in Parallel
 #' 
+#' @importFrom foreach foreach %dopar% %do%
+#' 
 #' @param data A \code{matrix} or \code{data.frame} containing the complete data
 #' set.
 #' @param cores The number of cores to be used to fit the model. This implies the 
@@ -9,11 +11,14 @@
 #' @param  fun A function fitting the model to the data subsample, first argument 
 #' must be dat. No other arguments allowed (for now)
 #' (\code{"parametric"}, \code{"semi-parametric"} (or \code{"non-parametric"}))
+#' 
 #' @return A list containing the full posterior and the sub-posteriors
+#' @export
 
 parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
 
-  ## Partition the data
+  # -----------------------------------------
+  # Partition the data
   data <- as.data.frame(dat)
   n_part <- cores
   n <- nrow(dat)
@@ -23,22 +28,13 @@ parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
     
   # -----------------------------------------
   # Fit model to each subsample
-  # ----------------------------------------
-  
-  # Register Workers for parallel computing
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl) 
-  
-  # Fit models
-  sub_post <- foreach::foreach(i = pdat, .packages = "MCMCpack") %dopar% {
-    fun(dat = i)
-  }
+  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(dat = i)}
   parallel::stopCluster(cl)
   
   # --------------------------------------------------------
   # Combine sub posteriors to full posterior Return results
-  # --------------------------------------------------------
-  
   if (combine == "parametric") full_post <- comb_par(sub_post)
   if (combine == "non-parametric") full_post <- comb_npar(sub_post)
   return(list(full = full_post, subs = sub_post))
