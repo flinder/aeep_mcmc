@@ -25,7 +25,7 @@ parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
   assgn <- sample(rep(1:n_part, length.out = n))
   pdat <- split(dat, assgn) 
   attr(pdat, "names") <- NULL
-    
+  
   # -----------------------------------------
   # Fit model to each subsample
   cl <- parallel::makeCluster(cores)

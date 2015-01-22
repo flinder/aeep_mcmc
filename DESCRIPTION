@@ -13,7 +13,8 @@ Imports:
   foreach,
   mvtnorm,
   Rcpp (>= 0.11.1),
-  RcppArmadillo (>= 0.4.200.0)
+  RcppArmadillo (>= 0.4.200.0),
+  rstan
 LinkingTo: Rcpp, RcppArmadillo
 Depends: RcppArmadillo
 BugReports: https://github.com/flinder/irtpar
