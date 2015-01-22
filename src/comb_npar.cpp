@@ -1,4 +1,3 @@
-#include <RcppArmadillo.h>
 #include <RcppArmadilloExtensions/sample.h>
 using namespace Rcpp;
 
@@ -111,9 +110,6 @@ NumericMatrix comb_nparC(List mcmcout) {
   int d = expl.ncol();
   int T = expl.nrow();
 	int M = mcmcout.size();
-  //Rcpp::Rcout << "d = " << d << std::endl;
-  //Rcpp::Rcout << "T = " << T << std::endl;
-  //Rcpp::Rcout << "M = " << M << std::endl;
   IntegerVector Ts(T);
   for(int i = 0; i < T; i++) {
     Ts[i] = i;
