@@ -3,9 +3,6 @@ using namespace Rcpp;
 
 // [[Rcpp::depends("RcppArmadillo")]]
 
-// Multivariate Normal Density
-const double log2pi = std::log(2.0 * M_PI);
-
 // Rcpp::NumericMatrix to arma::mat
   arma::mat m_conv(NumericMatrix x) {
     arma::mat y = as<arma::mat>(x);
@@ -30,6 +27,7 @@ double nv_mean(NumericVector x) {
 
 // multivariate normal density
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
+const double log2pi = std::log(2.0 * M_PI);
 arma::vec dmvnrm_arma(NumericMatrix x_i,  
                       NumericVector mean_i,  
                       NumericMatrix sigma_i, 
