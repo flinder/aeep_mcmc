@@ -1,13 +1,12 @@
 #' irtpar: A Package for Estimating Bayesian IRT Models in Parallel 
 #'
-#' The foo package provides three categories of important functions:
-#' foo, bar and baz.
+#' This packages provides tools to estimate bayesian models in parallel and more.
 #' 
 #' @section Foo functions:
 #' The foo functions ...
 #'
 #' @docType package
-#' @name foo
+#' @name irtpar
 #' @useDynLib irtpar
 #' @importFrom Rcpp sourceCpp
 NULL

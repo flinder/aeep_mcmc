@@ -38,6 +38,11 @@ Simulate IRT Data
 }
 \details{
 Generates data according to
-\deqn{Y \sim Bernoulli(\pi_{jk})}
+\deqn{
+ \begin{equation}
+ Y \sim Bernoulli(\pi_{jk}) \\
+ pi_{jk} = (1 + exp(-alpha_k * (theta_j - beta_k)))^{-1}
+ \end{equation}
+}
 }
 
