@@ -21,7 +21,7 @@ parameters {
   real theta[J]; // student ability parameters
 }
 model {
-  
+  real pi[N];
   for(j in 1:J)
     theta[j] ~ dw_normal(0.0, 1.0, M);
   for(k in 1:K) {
@@ -30,5 +30,7 @@ model {
   }
  
   for (n in 1:N)
-    Y[n] ~ bernoulli(1 / (1 + exp( - alpha[kk[n]] * (theta[jj[n]] - beta[kk[n]]))));
+    pi[n] <- 1 / (1 + exp( - alpha[kk[n]] * (theta[jj[n]] - beta[kk[n]])));
+  
+  Y ~ bernoulli(pi);
 }

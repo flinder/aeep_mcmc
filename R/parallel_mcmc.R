@@ -8,8 +8,9 @@
 #' number of partitions created. If not supplied the number of cores is detected 
 #' automatically.
 #' @param combine Method to be used to combine sub-posteriors to the full posterior
-#' @param  fun A function fitting the model to the data subsample, first argument 
-#' must be dat. No other arguments allowed (for now)
+#' @param  fun A function fitting the model to the data subsample. For now the
+#' function must only have two arguments. The first beeing the data, the second 
+#' beeing the number of partitions.
 #' (\code{"parametric"}, \code{"semi-parametric"} (or \code{"non-parametric"}))
 #' 
 #' @return A list containing the full posterior and the sub-posteriors
@@ -30,7 +31,7 @@ parallel_mcmc <- function(dat, cores, combine = "parametric", fun) {
   # Fit model to each subsample
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl) 
-  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(dat = i, M = n_part)}
+  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(i, n_part)}
   parallel::stopCluster(cl)
   
   # --------------------------------------------------------
