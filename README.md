@@ -4,8 +4,11 @@ This packages allows you to IRT models on sub samples of the data, in parallel a
 
 # Installation
 
-in order to be able to install the package you must have rstan installed. To do that follow the instructions [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
+in order to be able to install the package you must have *rstan* installed. To do that follow the instructions [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
-Then \texttt{irtpar} can be installed from within \texttt{R} with the following steps:
-1. If Install \texttt{devtools} (install.packages("devtools"))
-2. Run \texttt{devtools::install_github("flinder/irtpar")} from your console
+Then *irtpar* can be installed from within *R* with the following steps:
+```{r}
+library(devtools)
+install_github("flinder/irtpar")
+```
+
