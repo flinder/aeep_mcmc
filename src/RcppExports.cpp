@@ -102,18 +102,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // theta_bar
-NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M);
-RcppExport SEXP irtpar_theta_bar(SEXP tSEXP, SEXP mcmcoutSEXP, SEXP hSEXP, SEXP dSEXP, SEXP MSEXP) {
+NumericVector theta_bar(IntegerVector t, List post_list, double h, int d, int M);
+RcppExport SEXP irtpar_theta_bar(SEXP tSEXP, SEXP post_listSEXP, SEXP hSEXP, SEXP dSEXP, SEXP MSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< IntegerVector >::type t(tSEXP );
-        Rcpp::traits::input_parameter< List >::type mcmcout(mcmcoutSEXP );
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
         Rcpp::traits::input_parameter< double >::type h(hSEXP );
         Rcpp::traits::input_parameter< int >::type d(dSEXP );
         Rcpp::traits::input_parameter< int >::type M(MSEXP );
-        NumericVector __result = theta_bar(t, mcmcout, h, d, M);
+        NumericVector __result = theta_bar(t, post_list, h, d, M);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -121,33 +121,33 @@ BEGIN_RCPP
 END_RCPP
 }
 // mix_weight
-double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M);
-RcppExport SEXP irtpar_mix_weight(SEXP tSEXP, SEXP mcmcoutSEXP, SEXP hSEXP, SEXP dSEXP, SEXP MSEXP) {
+double mix_weight(IntegerVector t, List post_list, double h, int d, int M);
+RcppExport SEXP irtpar_mix_weight(SEXP tSEXP, SEXP post_listSEXP, SEXP hSEXP, SEXP dSEXP, SEXP MSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< IntegerVector >::type t(tSEXP );
-        Rcpp::traits::input_parameter< List >::type mcmcout(mcmcoutSEXP );
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
         Rcpp::traits::input_parameter< double >::type h(hSEXP );
         Rcpp::traits::input_parameter< int >::type d(dSEXP );
         Rcpp::traits::input_parameter< int >::type M(MSEXP );
-        double __result = mix_weight(t, mcmcout, h, d, M);
+        double __result = mix_weight(t, post_list, h, d, M);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
     return __sexp_result;
 END_RCPP
 }
-// comb_npar
-NumericMatrix comb_npar(List mcmcout);
-RcppExport SEXP irtpar_comb_npar(SEXP mcmcoutSEXP) {
+// combine_np
+NumericMatrix combine_np(List post_list);
+RcppExport SEXP irtpar_combine_np(SEXP post_listSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< List >::type mcmcout(mcmcoutSEXP );
-        NumericMatrix __result = comb_npar(mcmcout);
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
+        NumericMatrix __result = combine_np(post_list);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

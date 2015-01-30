@@ -36,7 +36,7 @@ parallel_mcmc <- function(data, cores, combine = "parametric", fun) {
   
   # --------------------------------------------------------
   # Combine sub posteriors to full posterior Return results
-  if (combine == "parametric") full_post <- comb_par(sub_post)
-  if (combine == "non-parametric") full_post <- comb_npar(sub_post)
+  if (combine == "parametric") full_post <- combine_p(sub_post)
+  if (combine == "non-parametric") full_post <- combine_np(sub_post)
   return(list(full = full_post, subs = sub_post))
 }

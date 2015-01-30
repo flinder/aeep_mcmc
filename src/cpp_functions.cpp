@@ -1,32 +1,31 @@
-/* still has fixed seed */
 #include <RcppArmadilloExtensions/sample.h>
 using namespace Rcpp;
 
 // [[Rcpp::depends("RcppArmadillo")]]
 
 // Rcpp::NumericMatrix to arma::mat
-// [[Rcpp::export]]
+// [[Rcpp::export(.m_conv)]]
   arma::mat m_conv(NumericMatrix x) {
     arma::mat y = as<arma::mat>(x);
     return(y);
   }
 
 // Rcpp::NumericVector to arma::rowvec
-// [[Rcpp::export]]
+// [[Rcpp::export(.v_conv)]]
 arma::mat v_conv(NumericVector x) {
   arma::mat y = as<arma::rowvec>(x);
   return(y);
 }
 
 // Rcpp::NumericVector to arma::vec
-// [[Rcpp::export]]
+// [[Rcpp::export(.v_conv1)]]
 arma::mat v_conv1(NumericVector x) {
   arma::mat y = as<arma::vec>(x);
   return(y);
 }
 
 // Mean from NumericVector
-// [[Rcpp::export]]
+// [[Rcpp::export(.nv_mean)]]
 double nv_mean(NumericVector x) {
   return sum(x) / x.size();
 }
@@ -69,12 +68,12 @@ arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
 }
 
-// [[Rcpp::export]]
-NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
+// [[Rcpp::export(.theta_bar)]]
+NumericVector theta_bar(IntegerVector t, List post_list, double h, int d, int M) {
   
   NumericMatrix sel(M, d);
   for(int i = 0; i < M; ++i) {
-    NumericMatrix postmat = mcmcout[i];
+    NumericMatrix postmat = post_list[i];
     NumericMatrix::Row selrow = sel(i, _);
     NumericMatrix::Row pmrow = postmat(t[i], _);
     selrow = pmrow;
@@ -87,12 +86,12 @@ NumericVector theta_bar(IntegerVector t, List mcmcout, double h, int d, int M) {
   return theta_bar;
 }
 
-// [[Rcpp::export]]
-double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
+// [[Rcpp::export(.mix_weight)]]
+double mix_weight(IntegerVector t, List post_list, double h, int d, int M) {
   
   NumericMatrix sel(M, d);
   for(int i = 0; i < M; ++i) {
-    NumericMatrix postmat = mcmcout[i];
+    NumericMatrix postmat = post_list[i];
     NumericMatrix::Row selrow = sel(i, _);
     NumericMatrix::Row pmrow = postmat(t[i], _);
     selrow = pmrow;
@@ -110,14 +109,16 @@ double mix_weight(IntegerVector t, List mcmcout, double h, int d, int M) {
 }
 
 /* Main Function */
-
+//' Non-parametric Combination of Sub-posteriors
+//' 
+//' @param post_list A list containing the sub-posterior samples, stored in matrices
+//' @return A matrix containing the combined posterior samples
 // [[Rcpp::export]]
-NumericMatrix comb_npar(List mcmcout) {
-  srand (1);
-  NumericMatrix exmpl = mcmcout[0];
+NumericMatrix combine_np(List post_list) {
+  NumericMatrix exmpl = post_list[0];
   int d = exmpl.ncol();
   int T = exmpl.nrow();
-  int M = mcmcout.size();
+  int M = post_list.size();
   IntegerVector Ts(T);
   for(int i = 0; i < T; i++) {
     Ts[i] = i;
@@ -133,8 +134,8 @@ NumericMatrix comb_npar(List mcmcout) {
 		for(int m = 0; m < M; ++m) {
       c_dot = t_dot;
 			c_dot[m] = urand[icount];
-      double w_c_dot = mix_weight(c_dot, mcmcout, h, d, M);
-      double w_t_dot = mix_weight(t_dot, mcmcout, h, d, M);
+      double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
+      double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
       double ratio = w_c_dot / w_t_dot;
       NumericVector u = runif(1);
       bool b = all(u < ratio).is_true();
@@ -143,7 +144,7 @@ NumericMatrix comb_npar(List mcmcout) {
       }
       icount += 1;
 		}
-    NumericVector theta_b = theta_bar(t_dot, mcmcout, h, d, M);
+    NumericVector theta_b = theta_bar(t_dot, post_list, h, d, M);
     NumericMatrix sig(d, d);
     sig.fill_diag(pow(h, 2) / M);
     arma::vec mu = v_conv1(theta_b);
