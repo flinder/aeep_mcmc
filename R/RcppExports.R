@@ -33,10 +33,22 @@ mvrnorm_arma <- function(n, mu, sigma) {
     .Call('irtpar_mix_weight', PACKAGE = 'irtpar', t, post_list, h, d, M)
 }
 
+.vcm <- function(X_i) {
+    .Call('irtpar_vcm', PACKAGE = 'irtpar', X_i)
+}
+
+post_vcm <- function(post_list) {
+    .Call('irtpar_post_vcm', PACKAGE = 'irtpar', post_list)
+}
+
+post_mean <- function(post_list, post_vcm) {
+    .Call('irtpar_post_mean', PACKAGE = 'irtpar', post_list, post_vcm)
+}
+
 #' Non-parametric Combination of Sub-posteriors
 #' 
 #' @param post_list A list containing the sub-posterior samples, stored in matrices
-#' @return A matrix containing the combined posterior samples
+#' @return A matrix containing the samples from the sub-posterior product function
 combine_np <- function(post_list) {
     .Call('irtpar_combine_np', PACKAGE = 'irtpar', post_list)
 }
