@@ -11,8 +11,8 @@ combine_p(post_list)
 sub-posteriors}
 }
 \value{
-A list containing a vector of means and variances of the full
-posterior
+A list containing a vector of means and the variance-covariance matrix
+of the full posterior
 }
 \description{
 Parametric Combination of Posteriors

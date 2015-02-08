@@ -31,7 +31,7 @@ double nv_mean(NumericVector x) {
 }
 
 // multivariate normal density
-// by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
+// based on code by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
 // [[Rcpp::export]]
 arma::vec dmvnrm_arma(NumericMatrix x_i,  
                       NumericVector mean_i,  
@@ -108,11 +108,60 @@ double mix_weight(IntegerVector t, List post_list, double h, int d, int M) {
   return out;
 }
 
-/* Main Function */
+// Calculate variance covariance matrix of a matrix
+// [[Rcpp::export(.vcm)]]
+arma::mat vcm(NumericMatrix X_i) {
+  arma::mat X = m_conv(X_i);
+  int n = X.n_rows;
+  // transform inmat into deviation matrix
+  arma::mat l = arma::ones(n, n);
+  arma::mat x = X - l * X / n;
+  arma::mat x_t = x.t();
+  arma::mat V = (x_t * x) / n;
+  // transform to Rcpp class
+  //NumericMatrix out = wrap(V);
+  return(V);
+}
+
+// [[Rcpp::export(post_vcm)]]
+arma::mat post_vcm(List post_list) {
+  NumericMatrix exmpl = post_list[0];
+  int d = exmpl.ncol();
+  int M = post_list.size();
+  arma::mat vcm_post = arma::zeros(d, d);
+  for(int i = 0; i < M; ++i) {
+    arma::mat vcm_m = vcm(post_list[i]);
+    arma::mat vcm_m_i = arma::inv(vcm_m);
+    vcm_post += vcm_m_i;
+  }
+  arma::mat out = arma::inv(vcm_post);
+  return(out);
+}
+
+// [[Rcpp::export(post_mean)]]
+arma::vec post_mean(List post_list, arma::mat post_vcm) {
+  NumericMatrix exmpl = post_list[0];
+  //int n = exmpl.nrow();
+  int d = exmpl.ncol();
+  int M = post_list.size();
+  arma::vec w_sig = arma::zeros(d, 1);
+  for(int i = 0; i < M; ++i) {
+    arma::mat vcm_m = vcm(post_list[i]);
+    arma::mat vcm_m_i = arma::inv(vcm_m);
+    arma::mat post_m = m_conv(post_list[i]);
+    arma::rowvec mu_m = arma::mean(post_m, 0);
+    arma::vec mu_m_t = mu_m.t();
+    w_sig += vcm_m_i * mu_m_t;
+  }
+  arma::mat out = post_vcm * w_sig;
+  //arma::vec out_t = out.t();
+  return(out);
+}
+
 //' Non-parametric Combination of Sub-posteriors
 //' 
 //' @param post_list A list containing the sub-posterior samples, stored in matrices
-//' @return A matrix containing the combined posterior samples
+//' @return A matrix containing the samples from the sub-posterior product function
 // [[Rcpp::export]]
 NumericMatrix combine_np(List post_list) {
   NumericMatrix exmpl = post_list[0];

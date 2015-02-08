@@ -139,6 +139,52 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// vcm
+arma::mat vcm(NumericMatrix X_i);
+RcppExport SEXP irtpar_vcm(SEXP X_iSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type X_i(X_iSEXP );
+        arma::mat __result = vcm(X_i);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// post_vcm
+arma::mat post_vcm(List post_list);
+RcppExport SEXP irtpar_post_vcm(SEXP post_listSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
+        arma::mat __result = post_vcm(post_list);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// post_mean
+arma::vec post_mean(List post_list, arma::mat post_vcm);
+RcppExport SEXP irtpar_post_mean(SEXP post_listSEXP, SEXP post_vcmSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type post_vcm(post_vcmSEXP );
+        arma::vec __result = post_mean(post_list, post_vcm);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // combine_np
 NumericMatrix combine_np(List post_list);
 RcppExport SEXP irtpar_combine_np(SEXP post_listSEXP) {

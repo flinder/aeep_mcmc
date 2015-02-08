@@ -10,7 +10,7 @@ combine_np(post_list)
 \item{post_list}{A list containing the sub-posterior samples, stored in matrices}
 }
 \value{
-A matrix containing the combined posterior samples
+A matrix containing the samples from the sub-posterior product function
 }
 \description{
 Non-parametric Combination of Sub-posteriors

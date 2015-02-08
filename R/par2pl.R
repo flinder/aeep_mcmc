@@ -1,7 +1,5 @@
 #' Fit 2pl IRT Models in Parallel
 #' 
-#' 
-#' 
 #' @param data A matrix or data.frame containing the complete data
 #' set.
 #' @param cores The number of cores to be used to fit the model. This implies the 
@@ -37,20 +35,15 @@ par2pl <- function(data,
   
   # Fitting function
   fit <- function(data, M) {
-    Y <- data
-    J <- nrow(Y)
-    K <- ncol(Y)
-    Y.vec <- stack(as.data.frame(Y))[, 1]
-    data.stan <- list("J" = J, 
-                      "K" = K, 
-                      "N" = J * K,  
-                      "jj" = rep(c(1:J), K), 
-                      "kk" = rep(c(1:K), each = J), 
-                      "Y" = Y.vec,
-                      "M" = M
-    )
+    J <- nrow(data)
+    K <- ncol(data)
+    data <- as.data.frame(data)
+    class(data) <- "list"
+    data_stan <- append(data, list(J = J, K = K, M = M))
 
-    model <- "
+    # Create stan model string
+    
+    model <- paste0("
     functions {
       real dw_normal_log(real y, real mu, real sigma, int M) {
         return normal_log(y, mu, sigma) / M;
@@ -60,36 +53,31 @@ par2pl <- function(data,
       }
     }
     data {
-      int<lower=1> J; // number of students
-      int<lower=1> K; // number of questions
-      int<lower=1> N; // number of observations
-      int<lower=1,upper=J> jj[N]; // student for observation n
-      int<lower=1,upper=K> kk[N]; // question for observation n
-      int<lower=0,upper=1> Y[N]; // correctness for observation n
-      int<lower=1> M; // number of partitions
-    }
+      int<lower=1> J;
+      int<lower=1> K;
+      int<lower=1> M;",
+    paste0("int<lower=0, upper=1> V", c(1:K), "[J];", collapse = "\n "),
+    "}
     parameters {
-      real<lower=0, upper=5> alpha[K]; // discrimination parameters
-      real beta[K]; // difficulty parameters
-      real theta[J]; // student ability parameters
+      real<lower=0> alpha[K]; 
+      real beta[K]; 
+      vector[J] theta; 
     }
     model {
-      real pi[N];
-      for(j in 1:J)
+      for(j in 1:J) {
         theta[j] ~ dw_normal(0.0, 1.0, M);
+      }
       for(k in 1:K) {
         beta[k] ~ dw_normal(0.0, 1.0, M);
-        alpha[k] ~ dw_lognormal(0.0, 6.0, M);    
-      }
-     
-      for (n in 1:N)
-        pi[n] <- 1 / (1 + exp( - alpha[kk[n]] * (theta[jj[n]] - beta[kk[n]])));
-      
-      Y ~ bernoulli(pi);
-    }    
-    "
-    res <- rstan::stan(model_code = model, model_name = "2pl", data = data.stan,
-                       iter = iter, warmup = warmup, chains = chains)
+        alpha[k] ~ dw_lognormal(0.0, 6, M);
+      }",
+    paste0("V", c(1:K), " ~ bernoulli_logit(beta[", c(1:K), "] + alpha[", c(1:K)
+           , "] * theta);", collapse = "\n "),
+    "}
+    ")
+   
+    res <- rstan::stan(model_code = model, data = data_stan, iter = iter, 
+                       warmup = warmup, chains = chains)
     out <- do.call(cbind,res@sim$samples[[1]][- (J + 2 * K + 1)])
     
     # Only do item parameters for now
@@ -98,7 +86,7 @@ par2pl <- function(data,
   }
   
   # Fit in parallel
-  out <- parallel_mcmc(dat = Y, cores = cores, combine = combine, fun = fit)
+  out <- parallel_mcmc(data = Y, cores = cores, combine = combine, fun = fit)
   
   return(out)
 }
