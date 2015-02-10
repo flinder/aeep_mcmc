@@ -4,7 +4,7 @@
 \alias{parallel_mcmc}
 \title{Fit Bayesian Models in Parallel}
 \usage{
-parallel_mcmc(data, cores, combine = "parametric", fun)
+parallel_mcmc(data, cores, combine = NULL, fun)
 }
 \arguments{
 \item{data}{A matrix or data.frame containing the complete data

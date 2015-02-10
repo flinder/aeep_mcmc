@@ -178,11 +178,11 @@ NumericMatrix combine_np(List post_list) {
   int icount = 0;
   NumericMatrix out(T, d);
   
-	for(int i = 0; i < T; ++i) {
-		double h = pow(i, (- 1 / (4 + d)));
-		for(int m = 0; m < M; ++m) {
+  for(int i = 0; i < T; ++i) {
+    double h = pow(i, (- 1 / (4 + d)));
+    for(int m = 0; m < M; ++m) {
       c_dot = t_dot;
-			c_dot[m] = urand[icount];
+      c_dot[m] = urand[icount];
       double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
       double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
       double ratio = w_c_dot / w_t_dot;
@@ -192,7 +192,7 @@ NumericMatrix combine_np(List post_list) {
         t_dot = c_dot;
       }
       icount += 1;
-		}
+    }
     NumericVector theta_b = theta_bar(t_dot, post_list, h, d, M);
     NumericMatrix sig(d, d);
     sig.fill_diag(pow(h, 2) / M);
@@ -202,6 +202,62 @@ NumericMatrix combine_np(List post_list) {
     NumericVector draws_rcpp = wrap(draws);
     NumericMatrix::Row outrow = out(i, _);
     outrow = draws_rcpp;
-	}
+  }
+  return(out);
+}
+
+
+//' Semi-parametric Combination of Sub-posteriors
+//' 
+//' @param post_list A list containing the sub-posterior samples, stored in matrices
+//' @return A matrix containing the samples from the sub-posterior product function
+// [[Rcpp::export]]
+NumericMatrix combine_sp(List post_list) {
+  NumericMatrix exmpl = post_list[0];
+  int d = exmpl.ncol();
+  int T = exmpl.nrow();
+  int M = post_list.size();
+  IntegerVector Ts(T);
+  for(int i = 0; i < T; i++) {
+    Ts[i] = i;
+  }
+  IntegerVector t_dot = RcppArmadillo::sample(Ts, M, TRUE);  
+  IntegerVector c_dot = t_dot;
+  IntegerVector urand = RcppArmadillo::sample(Ts, (M * T), TRUE);
+  int icount = 0;
+  NumericMatrix out(T, d);
+  arma::mat sig_m = post_vcm(post_list);
+  arma::vec mu_m  = post_mean(post_list, sig_m);
+  arma::vec sm_prod = sig_m.i() * mu_m;
+  
+  for(int i = 0; i < T; ++i) {
+    double h = pow(i, (- 1 / (4 + d)));
+    for(int m = 0; m < M; ++m) {
+      c_dot = t_dot;
+      c_dot[m] = urand[icount];
+      double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
+      double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
+      double ratio = w_c_dot / w_t_dot;
+      NumericVector u = runif(1);
+      bool b = all(u < ratio).is_true();
+      if(b) {
+        t_dot = c_dot;
+      }
+      icount += 1;
+    }
+    NumericVector theta_b = theta_bar(t_dot, post_list, h, d, M);
+    arma::vec theta_b_con = v_conv1(theta_b);
+    arma::mat sig(d, d);
+    sig.eye();
+    sig *= (M / h);
+    arma::mat sig1(d, d);
+    sig1 += sig_m.i();
+    arma::mat sig_t_dot = sig1.i();
+    arma::vec mu_t_dot = sig_t_dot * (sig * theta_b_con + sm_prod);
+    arma::mat draws = mvrnorm_arma(1, theta_b_con, sig_t_dot);
+    NumericVector draws_rcpp = wrap(draws);
+    NumericMatrix::Row outrow = out(i, _);
+    outrow = draws_rcpp;
+  }
   return(out);
 }
