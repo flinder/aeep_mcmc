@@ -177,7 +177,6 @@ NumericMatrix combine_np(List post_list) {
   IntegerVector urand = RcppArmadillo::sample(Ts, (M * T), TRUE);
   int icount = 0;
   NumericMatrix out(T, d);
-  
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
     for(int m = 0; m < M; ++m) {
@@ -229,7 +228,6 @@ NumericMatrix combine_sp(List post_list) {
   arma::mat sig_m = post_vcm(post_list);
   arma::vec mu_m  = post_mean(post_list, sig_m);
   arma::vec sm_prod = sig_m.i() * mu_m;
-  
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
     for(int m = 0; m < M; ++m) {
