@@ -53,3 +53,11 @@ combine_np <- function(post_list) {
     .Call('irtpar_combine_np', PACKAGE = 'irtpar', post_list)
 }
 
+#' Semi-parametric Combination of Sub-posteriors
+#' 
+#' @param post_list A list containing the sub-posterior samples, stored in matrices
+#' @return A matrix containing the samples from the sub-posterior product function
+combine_sp <- function(post_list) {
+    .Call('irtpar_combine_sp', PACKAGE = 'irtpar', post_list)
+}
+

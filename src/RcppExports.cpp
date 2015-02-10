@@ -200,3 +200,18 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// combine_sp
+NumericMatrix combine_sp(List post_list);
+RcppExport SEXP irtpar_combine_sp(SEXP post_listSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type post_list(post_listSEXP );
+        NumericMatrix __result = combine_sp(post_list);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

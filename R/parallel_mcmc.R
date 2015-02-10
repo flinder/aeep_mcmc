@@ -16,7 +16,7 @@
 #' @return A list containing the full posterior and the sub-posteriors
 #' @export
 
-parallel_mcmc <- function(data, cores, combine = "parametric", fun) {
+parallel_mcmc <- function(data, cores, combine = NULL, fun) {
 
   # -----------------------------------------
   # Partition the data
@@ -36,7 +36,19 @@ parallel_mcmc <- function(data, cores, combine = "parametric", fun) {
   
   # --------------------------------------------------------
   # Combine sub posteriors to full posterior Return results
-  if (combine == "parametric") full_post <- combine_p(sub_post)
-  if (combine == "non-parametric") full_post <- combine_np(sub_post)
-  return(list(full = full_post, subs = sub_post))
+  if(is.null(combine)) {
+    out <- sub_post
+  } else if(combine == "parametric") {
+    out <- combine_p(sub_post)
+  } else if(combine == "non-parametric") {
+    out <- combine_np(sub_post)  
+  } else if(combine == "semi-parametric") {
+    out <- combine_sp(sub_post)  
+  } else {
+    warning("Invalid 'combine' argument, returning sub-posteriors.
+            Sub-posteriors can be combined with combine_p(), combine_sp() and
+            combine_np()")
+    out <- sub_post
+  }
+  return(out)
 }
