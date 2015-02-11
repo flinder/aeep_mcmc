@@ -150,7 +150,9 @@ arma::vec mix_weight_sp(arma::vec t,
                      List post_list,
                      double h,
                      int d,
-                     int M) {
+                     int M,
+                     List post_means,
+                     List post_vcms) {
   arma::vec theta_b = theta_bar(t, post_list, h, d, M);
   arma::mat theta_b_mat(1, d);
   theta_b_mat.row(0) = trans(theta_b);
@@ -160,8 +162,8 @@ arma::vec mix_weight_sp(arma::vec t,
   for(int m = 0; m < M; ++m) {
     arma::mat post = post_list[m];
     arma::rowvec theta_tm = post.row(t[m]);
-    arma::rowvec mu_m = mean(post);
-    arma::mat vcm_m = vcm(post);
+    arma::rowvec mu_m = post_means[m];
+    arma::mat vcm_m = post_vcms[m];
     arma::vec d = dmvnrm_arma(theta_tm, mu_m, vcm_m);
     den = den * d;
   }
@@ -191,6 +193,16 @@ arma::mat combine_sp(List post_list) {
   arma::mat sig_M = post_vcm(post_list, d, M);
   arma::vec mu_M  = post_mean(post_list, sig_M, d, M);
   arma::vec sm_prod = sig_M.i() * mu_M;
+  
+  List post_means(M);
+  List post_vcms(M);
+  
+  for(int m = 0; m < M; ++m) {
+    arma::mat post = post_list[m];
+    post_means[m] = mean(post);
+    post_vcms[m] = vcm(post);
+  }
+  
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
     for(int m = 0; m < M; ++m) {
@@ -199,9 +211,9 @@ arma::mat combine_sp(List post_list) {
       double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
       double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
       arma::vec W_c_dot = mix_weight_sp(c_dot, sig_M, mu_M, w_c_dot, post_list, 
-                                        h, d, M);
+                                        h, d, M, post_means, post_vcms);
       arma::vec W_t_dot = mix_weight_sp(t_dot, sig_M, mu_M, w_t_dot, post_list, 
-                                        h, d, M);
+                                        h, d, M, post_means, post_vcms);
       arma::vec ratio_v = W_c_dot / W_t_dot;
       double ratio = ratio_v[0];
       NumericVector u_v = runif(1);

@@ -37,8 +37,8 @@ combine_np <- function(post_list) {
     .Call('irtpar_combine_np', PACKAGE = 'irtpar', post_list)
 }
 
-.mix_weight_sp <- function(t, sig_M, mu_M, w_t_dot, post_list, h, d, M) {
-    .Call('irtpar_mix_weight_sp', PACKAGE = 'irtpar', t, sig_M, mu_M, w_t_dot, post_list, h, d, M)
+.mix_weight_sp <- function(t, sig_M, mu_M, w_t_dot, post_list, h, d, M, post_means, post_vcms) {
+    .Call('irtpar_mix_weight_sp', PACKAGE = 'irtpar', t, sig_M, mu_M, w_t_dot, post_list, h, d, M, post_means, post_vcms)
 }
 
 #' Semi-parametric Combination of Sub-posteriors
