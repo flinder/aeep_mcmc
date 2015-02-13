@@ -193,16 +193,13 @@ arma::mat combine_sp(List post_list) {
   arma::mat sig_M = post_vcm(post_list, d, M);
   arma::vec mu_M  = post_mean(post_list, sig_M, d, M);
   arma::vec sm_prod = sig_M.i() * mu_M;
-  
   List post_means(M);
   List post_vcms(M);
-  
   for(int m = 0; m < M; ++m) {
     arma::mat post = post_list[m];
     post_means[m] = mean(post);
     post_vcms[m] = vcm(post);
   }
-  
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
     for(int m = 0; m < M; ++m) {
@@ -232,4 +229,3 @@ arma::mat combine_sp(List post_list) {
   }
   return(out);
 }
-

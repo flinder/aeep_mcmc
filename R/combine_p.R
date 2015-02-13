@@ -4,6 +4,7 @@
 #' sub-posteriors
 #' @return A list containing a vector of means and the variance-covariance matrix
 #' of the full posterior
+#' @export
 combine_p <- function(post_list) {
   d <- ncol(post_list[[1]])
   M <- length(post_list)
