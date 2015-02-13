@@ -16,11 +16,12 @@
 #' @return A list containing the full posterior and the sub-posteriors
 #' @export
 
-parallel_mcmc <- function(data, cores, combine = NULL, fun) {
+parallel_mcmc <- function(data, cores = NULL, combine = NULL, fun, ...) {
 
   # -----------------------------------------
   # Partition the data
   data <- as.data.frame(data)
+  if(is.null(cores)) cores <- detectCores()
   n_part <- cores
   n <- nrow(data)
   assgn <- sample(rep(1:n_part, length.out = n))
@@ -31,7 +32,9 @@ parallel_mcmc <- function(data, cores, combine = NULL, fun) {
   # Fit model to each subsample
   cl <- parallel::makeCluster(cores)
   doParallel::registerDoParallel(cl) 
-  sub_post <- foreach::foreach(i = pdat) %dopar% { fun(i, n_part)}
+  sub_post <- foreach::foreach(i = pdat, .packages = "rstan") %dopar% { 
+    fun(data = i, n_partitions = n_part, ...)
+  }
   parallel::stopCluster(cl)
   
   # --------------------------------------------------------
