@@ -103,6 +103,7 @@ double mix_weight(arma::vec t, List post_list, double h, int d, int M) {
 //' 
 //' @param post_list A list containing the sub-posterior samples, stored in matrices
 //' @return A matrix containing the samples from the sub-posterior product function
+//' @export
 // [[Rcpp::export]]
 arma::mat combine_np(List post_list) {
   arma::mat exmpl = post_list[0];
@@ -175,6 +176,7 @@ arma::vec mix_weight_sp(arma::vec t,
 //' 
 //' @param post_list A list containing the sub-posterior samples, stored in matrices
 //' @return A matrix containing the samples from the sub-posterior product function
+//' @export
 // [[Rcpp::export]]
 arma::mat combine_sp(List post_list) {
   arma::mat exmpl = post_list[0];
