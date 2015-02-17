@@ -1,6 +1,7 @@
 #include <RcppArmadilloExtensions/sample.h>
 using namespace Rcpp;
 
+
 // [[Rcpp::depends("RcppArmadillo")]]
 
 // multivariate normal density
@@ -34,24 +35,14 @@ arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
 }
 
-// Calculate variance covariance matrix of a data-matrix
-// [[Rcpp::export(.vcm)]]
-arma::mat vcm(arma::mat X) {
-  int n = X.n_rows;
-  arma::mat l = arma::ones(n, n);
-  arma::mat x = X - l * X / n;
-  arma::mat x_t = x.t();
-  arma::mat V = (x_t * x) / n;
-  return(V);
-}
-
 // Calculate the variance covariance matrix of the full posterior assuming
 // multivariate normal sub-posteriors
 // [[Rcpp::export(post_vcm)]]
 arma::mat post_vcm(List post_list, int d, int M) {
   arma::mat vcm_post = arma::zeros(d, d);
   for(int i = 0; i < M; ++i) {
-    arma::mat vcm_m = vcm(post_list[i]);
+    arma::mat post = post_list[i];
+    arma::mat vcm_m = arma::cov(post);
     arma::mat vcm_m_i = arma::inv(vcm_m);
     vcm_post += vcm_m_i;
   }
@@ -66,8 +57,8 @@ arma::vec post_mean(List post_list, arma::mat post_vcm, int d, int M) {
   arma::vec w_sig = arma::zeros(d, 1);
   for(int i = 0; i < M; ++i) {
     arma::mat post = post_list[i];
-    arma::mat vcm_m = vcm(post);
-    arma::rowvec mu_m = arma::mean(post, 0);
+    arma::mat vcm_m = arma::cov(post);
+    arma::rowvec mu_m = mean(post, 0);
     w_sig += inv(vcm_m) * trans(mu_m);
   }
   arma::mat out = post_vcm * w_sig;
@@ -200,7 +191,7 @@ arma::mat combine_sp(List post_list) {
   for(int m = 0; m < M; ++m) {
     arma::mat post = post_list[m];
     post_means[m] = mean(post);
-    post_vcms[m] = vcm(post);
+    post_vcms[m] = arma::cov(post);
   }
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
