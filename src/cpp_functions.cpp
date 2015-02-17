@@ -77,13 +77,17 @@ arma::vec theta_bar(arma::vec t, List post_list, double h, int d, int M) {
 }
 
 // [[Rcpp::export(.mix_weight)]]
-double mix_weight(arma::vec t, List post_list, double h, int d, int M) {
+double mix_weight(arma::vec t, 
+                  List post_list, 
+                  double h, 
+                  int d, 
+                  int M, 
+                  arma::vec theta_b) {
   arma::mat sel(M, d);
   for(int i = 0; i < M; ++i) {
     arma::mat postmat = post_list[i];
     sel.row(i) = postmat.row(t[i]);
   }
-  arma::vec theta_b = theta_bar(t, post_list, h, d, M);
   arma::mat sigma = arma::eye(d, d) * pow(h, 2);
   arma::vec dens = dmvnrm_arma(sel, trans(theta_b), sigma);
   double out = prod(dens);
@@ -115,8 +119,13 @@ arma::mat combine_np(List post_list) {
     for(int m = 0; m < M; ++m) {
       c_dot = t_dot;
       c_dot[m] = urand[icount];
-      double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
-      double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
+      
+      arma::vec theta_b = theta_bar(c_dot, post_list, h, d, M);
+      double w_c_dot = mix_weight(c_dot, post_list, h, d, M, theta_b);
+      
+      theta_b = theta_bar(t_dot, post_list, h, d, M);
+      double w_t_dot = mix_weight(t_dot, post_list, h, d, M, theta_b);
+      
       double ratio = w_c_dot / w_t_dot;
       NumericVector u = runif(1);
       bool b = all(u < ratio).is_true();
@@ -144,8 +153,8 @@ arma::vec mix_weight_sp(arma::vec t,
                      int d,
                      int M,
                      List post_means,
-                     List post_vcms) {
-  arma::vec theta_b = theta_bar(t, post_list, h, d, M);
+                     List post_vcms,
+                     arma::vec theta_b) {
   arma::mat theta_b_mat(1, d);
   theta_b_mat.row(0) = trans(theta_b);
   arma::mat sig = sig_M + arma::eye(d, d) * h / M;
@@ -198,12 +207,16 @@ arma::mat combine_sp(List post_list) {
     for(int m = 0; m < M; ++m) {
       c_dot = t_dot;
       c_dot[m] = urand[icount];
-      double w_c_dot = mix_weight(c_dot, post_list, h, d, M);
-      double w_t_dot = mix_weight(t_dot, post_list, h, d, M);
+      
+      arma::vec theta_b = theta_bar(c_dot, post_list, h, d, M);
+      double w_c_dot = mix_weight(c_dot, post_list, h, d, M, theta_b);
       arma::vec W_c_dot = mix_weight_sp(c_dot, sig_M, mu_M, w_c_dot, post_list, 
-                                        h, d, M, post_means, post_vcms);
+                                        h, d, M, post_means, post_vcms, theta_b);
+                                        
+      theta_b = theta_bar(t_dot, post_list, h, d, M);
+      double w_t_dot = mix_weight(t_dot, post_list, h, d, M, theta_b);
       arma::vec W_t_dot = mix_weight_sp(t_dot, sig_M, mu_M, w_t_dot, post_list, 
-                                        h, d, M, post_means, post_vcms);
+                                        h, d, M, post_means, post_vcms, theta_b);
       arma::vec ratio_v = W_c_dot / W_t_dot;
       double ratio = ratio_v[0];
       NumericVector u_v = runif(1);
