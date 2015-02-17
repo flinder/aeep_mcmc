@@ -9,10 +9,6 @@ mvrnorm_arma <- function(n, mu, sigma) {
     .Call('irtpar_mvrnorm_arma', PACKAGE = 'irtpar', n, mu, sigma)
 }
 
-.vcm <- function(X) {
-    .Call('irtpar_vcm', PACKAGE = 'irtpar', X)
-}
-
 post_vcm <- function(post_list, d, M) {
     .Call('irtpar_post_vcm', PACKAGE = 'irtpar', post_list, d, M)
 }
