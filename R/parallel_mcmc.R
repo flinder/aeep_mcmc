@@ -34,6 +34,8 @@ parallel_mcmc <- function(data, cores = NULL, combine = NULL, fun, ...) {
   doParallel::registerDoParallel(cl) 
   sub_post <- foreach::foreach(i = pdat, .packages = "rstan") %dopar% { 
     fun(data = i, n_partitions = n_part, ...)
+    #fun(data = i, n_partitions = n_part, c_mod = c_model_dw, iter = iter, chains = chains, 
+    #    warmup = warmup)
   }
   parallel::stopCluster(cl)
   
