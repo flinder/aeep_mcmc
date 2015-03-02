@@ -19,3 +19,4 @@ LinkingTo: Rcpp, RcppArmadillo
 Depends: RcppArmadillo
 BugReports: https://github.com/flinder/irtpar
 Suggests: testthat
+
