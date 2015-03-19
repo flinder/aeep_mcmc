@@ -5,7 +5,7 @@ This packages allows you to IRT models on sub samples of the data, in parallel a
 
 ## Installation
 
-in order to be able to install the package you must have *rstan* installed. To do that follow the instructions [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
+Some functionality can be used already. In order to be able to install the package you must have *rstan* installed. To do that follow the instructions [here](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started).
 
 Then *irtpar* can be installed from within *R* with the following steps:
 ```{r}
