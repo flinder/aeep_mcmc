@@ -13,9 +13,9 @@ using namespace Rcpp;
 // given mean vector 'mean' and variance covariance matrix 'sigma'
 // based on code by Ahmadou Dicko (http://gallery.rcpp.org/articles/dmvnorm_arma/)
 // [[Rcpp::export]]
-arma::vec dmvnrm_arma(arma::mat x,  
-                      arma::rowvec mean,  
-                      arma::mat sigma) {
+arma::vec dmvnrm_arma(const arma::mat& x,  
+                      const arma::rowvec& mean,  
+                      const arma::mat& sigma) {
   const double log2pi = std::log(2.0 * M_PI);
   int n = x.n_rows;
   int xdim = x.n_cols;
@@ -23,7 +23,7 @@ arma::vec dmvnrm_arma(arma::mat x,
   arma::mat rooti = arma::trans(arma::inv(trimatu(arma::chol(sigma))));
   double rootisum = arma::sum(log(rooti.diag()));
   double constants = -(static_cast<double>(xdim)/2.0) * log2pi;
-  
+ 
   for (int i=0; i < n; i++) {
     arma::vec z = rooti * arma::trans( x.row(i) - mean) ;    
     out(i)      = constants - 0.5 * arma::sum(z%z) + rootisum;     
@@ -37,7 +37,7 @@ arma::vec dmvnrm_arma(arma::mat x,
 // with mean mu and variance covariance matrix sigma
 // by Ahmadou Dicko (http://gallery.rcpp.org/articles/simulate-multivariate-normal/)
 // [[Rcpp::export]]
-arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
+arma::mat mvrnorm_arma(int n, const arma::vec& mu, const arma::mat& sigma) {
    int ncols = sigma.n_cols;
    arma::mat Y = arma::randn(n, ncols);
    return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
@@ -51,7 +51,7 @@ arma::mat mvrnorm_arma(int n, arma::vec mu, arma::mat sigma) {
 // M: Number of sub posteriors
 // d: dimensionality of the posteriors
 // [[Rcpp::export(post_vcm)]]
-arma::mat post_vcm(List post_list, int d, int M) {
+arma::mat post_vcm(const List& post_list, int d, int M) {
   arma::mat vcm_post = arma::zeros(d, d);
   for(int i = 0; i < M; ++i) {
     arma::mat post = post_list[i];
@@ -72,7 +72,7 @@ arma::mat post_vcm(List post_list, int d, int M) {
 // d: dimensionality of the posteriors
 // post_vcm: combined variance covariance matrix (output of post_vcm())
 // [[Rcpp::export(post_mean)]]
-arma::vec post_mean(List post_list, arma::mat post_vcm, int d, int M) {
+arma::vec post_mean(const List& post_list, const arma::mat& post_vcm, int d, int M) {
   arma::vec w_sig = arma::zeros(d, 1);
   for(int i = 0; i < M; ++i) {
     arma::mat post = post_list[i];
@@ -94,7 +94,7 @@ arma::vec post_mean(List post_list, arma::mat post_vcm, int d, int M) {
 // d: dimensionality of the posterior (parameters in the model)
 // M: number of sub-posteriors
 // [[Rcpp::export(.theta_bar)]]
-arma::vec theta_bar(arma::vec t, List post_list, double h, int d, int M) {
+arma::vec theta_bar(const arma::vec& t, const List& post_list, double h, int d, int M) {
   // Create matrix of selected samples
   arma::mat sel(M, d);
   for(int i = 0; i < M; ++i) {
@@ -115,12 +115,12 @@ arma::vec theta_bar(arma::vec t, List post_list, double h, int d, int M) {
 // d: dimensionality of the posterior (parameters in the model)
 // M: number of sub-posteriors
 // [[Rcpp::export(.mix_weight)]]
-double mix_weight(arma::vec t, 
-                  List post_list, 
+double mix_weight(const arma::vec& t, 
+                  const List& post_list, 
                   double h, 
                   int d, 
                   int M, 
-                  arma::vec theta_b) {
+                  const arma::vec& theta_b) {
   
   // Create matrix of selected samples
   arma::mat sel(M, d);
@@ -144,7 +144,7 @@ double mix_weight(arma::vec t,
 //' @return A matrix containing the samples from the sub-posterior product function
 //' @export
 // [[Rcpp::export]]
-arma::mat combine_np(List post_list) {
+arma::mat combine_np(const List& post_list) {
   // Get number of dimensions , sub-posteriors, etc...
   arma::mat exmpl = post_list[0];
   int d = exmpl.n_cols; // dimensions
@@ -216,17 +216,17 @@ arma::mat combine_np(List post_list) {
 // post_vcms: Variance covariance matrices of sub-posteriors
 // theta_b: Mean vector in current iteration
 // [[Rcpp::export(.mix_weight_sp)]]
-arma::vec mix_weight_sp(arma::vec t, 
-                     arma::mat sig_M, 
-                     arma::vec mu_M, 
-                     double w_t_dot,
-                     List post_list,
-                     double h,
-                     int d,
-                     int M,
-                     List post_means,
-                     List post_vcms,
-                     arma::vec theta_b) {
+arma::vec mix_weight_sp(const arma::vec& t, 
+                     const arma::mat& sig_M, 
+                     const arma::vec& mu_M, 
+                     const double& w_t_dot,
+                     const List& post_list,
+                     const double& h,
+                     const int& d,
+                     const int& M,
+                     const List& post_means,
+                     const List& post_vcms,
+                     const arma::vec& theta_b) {
   arma::mat theta_b_mat(1, d);
   theta_b_mat.row(0) = trans(theta_b);
   arma::mat sig = sig_M + arma::eye(d, d) * h / M;
@@ -254,7 +254,7 @@ arma::vec mix_weight_sp(arma::vec t,
 //' @return A matrix containing the samples from the sub-posterior product function
 //' @export
 // [[Rcpp::export]]
-arma::mat combine_sp(List post_list) {
+arma::mat combine_sp(const List& post_list) {
   arma::mat exmpl = post_list[0];
   int d = exmpl.n_cols;
   int T = exmpl.n_rows;
