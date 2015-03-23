@@ -69,14 +69,11 @@ sub_post_9 <- list(matrix(rnorm(n), nc = 10),
                    matrix(rnorm(n), nc = 10)
 )
 
-out <- NULL
-combine_p(sub_post_1, out)
-
 microbenchmark(
   combine_p(sub_post_1),
   combine_sp(sub_post_1),
   combine_np(sub_post_1),
-  times = 2
+  times = 10
   )
 
 microbenchmark(
@@ -86,7 +83,7 @@ microbenchmark(
   times = 10
 )
 
-microbenchmark(
+jmicrobenchmark(
   combine_p(sub_post_3),
   combine_sp(sub_post_3),
   combine_np(sub_post_3),

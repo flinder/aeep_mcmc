@@ -162,6 +162,10 @@ arma::mat combine_np(const List& post_list) {
   arma::vec urand = RcppArmadillo::sample(Ts, (M * T), TRUE);
   int icount = 0; //index to loop through urand
   arma::mat out(T, d); // output matrix
+  double w_last; // mixture weight from previous iteration
+  double w_prop; // mixture weight for proposal
+  bool b = false; // MH acceptance indicator
+
   
   // Gibbs loop
   for(int i = 0; i < T; ++i) {
@@ -173,18 +177,23 @@ arma::mat combine_np(const List& post_list) {
       c_dot = t_dot;
       // change one index for proposal
       c_dot[m] = urand[icount];
+
+      // Mixture weight for last step
+      if(i == 0 & m == 0) {
+	arma::vec theta_b_last = theta_bar(t_dot, post_list, h, d, M);
+	double w_last = mix_weight(t_dot, post_list, h, d, M, theta_b_last);
+      } else if(b) {
+        w_last = w_prop;
+      } else {
+	// W_last = W_last; nothing happens
+      }
       
       // calculate mixture weight of proposal
-      arma::vec theta_b = theta_bar(c_dot, post_list, h, d, M);
-      double w_c_dot = mix_weight(c_dot, post_list, h, d, M, theta_b);
-      
-      // calculate old mixture weight (this step migt be avoidable by carrying 
-      // the weight calculated above to the next iteration)
-      theta_b = theta_bar(t_dot, post_list, h, d, M);
-      double w_t_dot = mix_weight(t_dot, post_list, h, d, M, theta_b);
+      arma::vec theta_b_prop = theta_bar(c_dot, post_list, h, d, M);
+      double w_prop = mix_weight(c_dot, post_list, h, d, M, theta_b_prop);
       
       // get density ratio of proposal / last iteration
-      double ratio = w_c_dot / w_t_dot;
+      double ratio = w_prop / w_last;
       NumericVector u = runif(1);
       
       // Metropolis stochastic acceptance step
@@ -282,37 +291,43 @@ arma::mat combine_sp(const List& post_list) {
     post_means[m] = mean(post);
     post_vcms[m] = arma::cov(post);
   }
-  
+  // initialize some variables
+  arma::vec W_last(1);
+  arma::vec W_prop(1);
+  bool b = false;
   // Gibbs Loop
   for(int i = 0; i < T; ++i) {
     double h = pow(i, (- 1 / (4 + d)));
-    
     // Metropolis Loop
     for(int m = 0; m < M; ++m) {
       c_dot = t_dot;
       // Proposal
       c_dot[m] = urand[icount];
+
+      // Mixture weight for last step
+      if(i == 0 & m == 0) {
+	arma::vec theta_b_last = theta_bar(t_dot, post_list, h, d, M);
+	double w_last = mix_weight(t_dot, post_list, h, d, M, theta_b_last);
+	arma::vec W_last = mix_weight_sp(t_dot, sig_M, mu_M, w_last, post_list,
+					  h, d, M, post_means, post_vcms, theta_b_last);
+      } else if(b) {
+        W_last = W_prop;
+      } else {
+	// W_last = W_last; nothing happens
+      }
       
       // Mixture weight for proposal
-      arma::vec theta_b = theta_bar(c_dot, post_list, h, d, M);
-      double w_c_dot = mix_weight(c_dot, post_list, h, d, M, theta_b);
-      arma::vec W_c_dot = mix_weight_sp(c_dot, sig_M, mu_M, w_c_dot, post_list, 
-                                        h, d, M, post_means, post_vcms, theta_b);
-      
-      // Mixture weight for last step (again can be avoided by using above calculated 
-      // weight from the last iteration?)
-      theta_b = theta_bar(t_dot, post_list, h, d, M);
-      double w_t_dot = mix_weight(t_dot, post_list, h, d, M, theta_b);
-      arma::vec W_t_dot = mix_weight_sp(t_dot, sig_M, mu_M, w_t_dot, post_list, 
-                                        h, d, M, post_means, post_vcms, theta_b);
+      arma::vec theta_b_prop = theta_bar(c_dot, post_list, h, d, M);
+      double w_prop = mix_weight(c_dot, post_list, h, d, M, theta_b_prop);
+      arma::vec W_prop = mix_weight_sp(c_dot, sig_M, mu_M, w_prop, post_list, 
+                                        h, d, M, post_means, post_vcms, theta_b_prop);     
       // Density ratio
-      arma::vec ratio_v = W_c_dot / W_t_dot;
-      
+      double ratio = arma::as_scalar(W_prop / W_last);
       // acceptance step
-      double ratio = ratio_v[0];
       NumericVector u_v = runif(1);
       double u = u_v[0];
-      if(u < ratio) {
+      bool b = u < ratio;
+      if(b) {
         t_dot = c_dot;
       }
       icount += 1;
