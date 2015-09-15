@@ -2,27 +2,27 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 dmvnrm_arma <- function(x, mean, sigma) {
-    .Call('irtpar_dmvnrm_arma', PACKAGE = 'irtpar', x, mean, sigma)
+    .Call('aeep_dmvnrm_arma', PACKAGE = 'aeep', x, mean, sigma)
 }
 
 mvrnorm_arma <- function(n, mu, sigma) {
-    .Call('irtpar_mvrnorm_arma', PACKAGE = 'irtpar', n, mu, sigma)
+    .Call('aeep_mvrnorm_arma', PACKAGE = 'aeep', n, mu, sigma)
 }
 
 post_vcm <- function(post_list, d, M) {
-    .Call('irtpar_post_vcm', PACKAGE = 'irtpar', post_list, d, M)
+    .Call('aeep_post_vcm', PACKAGE = 'aeep', post_list, d, M)
 }
 
 post_mean <- function(post_list, post_vcm, d, M) {
-    .Call('irtpar_post_mean', PACKAGE = 'irtpar', post_list, post_vcm, d, M)
+    .Call('aeep_post_mean', PACKAGE = 'aeep', post_list, post_vcm, d, M)
 }
 
 .theta_bar <- function(t, post_list, h, d, M) {
-    .Call('irtpar_theta_bar', PACKAGE = 'irtpar', t, post_list, h, d, M)
+    .Call('aeep_theta_bar', PACKAGE = 'aeep', t, post_list, h, d, M)
 }
 
 .mix_weight <- function(t, post_list, h, d, M, theta_b) {
-    .Call('irtpar_mix_weight', PACKAGE = 'irtpar', t, post_list, h, d, M, theta_b)
+    .Call('aeep_mix_weight', PACKAGE = 'aeep', t, post_list, h, d, M, theta_b)
 }
 
 #' Non-parametric Combination of Sub-posteriors
@@ -30,11 +30,11 @@ post_mean <- function(post_list, post_vcm, d, M) {
 #' @return A matrix containing the samples from the sub-posterior product function
 #' @export
 combine_np <- function(post_list) {
-    .Call('irtpar_combine_np', PACKAGE = 'irtpar', post_list)
+    .Call('aeep_combine_np', PACKAGE = 'aeep', post_list)
 }
 
 .mix_weight_sp <- function(t, sig_M, mu_M, w_t_dot, post_list, h, d, M, post_means, post_vcms, theta_b) {
-    .Call('irtpar_mix_weight_sp', PACKAGE = 'irtpar', t, sig_M, mu_M, w_t_dot, post_list, h, d, M, post_means, post_vcms, theta_b)
+    .Call('aeep_mix_weight_sp', PACKAGE = 'aeep', t, sig_M, mu_M, w_t_dot, post_list, h, d, M, post_means, post_vcms, theta_b)
 }
 
 #' Semi-parametric Combination of Sub-posteriors
@@ -43,6 +43,6 @@ combine_np <- function(post_list) {
 #' @return A matrix containing the samples from the sub-posterior product function
 #' @export
 combine_sp <- function(post_list) {
-    .Call('irtpar_combine_sp', PACKAGE = 'irtpar', post_list)
+    .Call('aeep_combine_sp', PACKAGE = 'aeep', post_list)
 }
 
