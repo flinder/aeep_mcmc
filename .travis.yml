@@ -1,2 +1,6 @@
 language: r
 sudo: required
+
+branches:
+    except:
+     - before_rebuild
