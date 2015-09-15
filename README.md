@@ -4,7 +4,7 @@ This package implements the combination algorithms described in [Neiswanger, Wan
 
 ## Installation
 
-``{r}
+```{r}
 library(devtools)
 install_github("flinder/aeep_mcmc")
 ```
