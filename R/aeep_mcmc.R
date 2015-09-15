@@ -1,4 +1,4 @@
-#' irtpar: A Package for Estimating Bayesian IRT Models in Parallel 
+#' aeep: Estimate Bayesian Models in Parallel 
 #'
 #' This packages provides tools to estimate bayesian models in parallel and more.
 #' 
@@ -6,7 +6,7 @@
 #' The foo functions ...
 #'
 #' @docType package
-#' @name irtpar
-#' @useDynLib irtpar
+#' @name aeep
+#' @useDynLib aeep 
 #' @importFrom Rcpp sourceCpp
 NULL
